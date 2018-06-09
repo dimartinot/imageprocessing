@@ -1,16 +1,46 @@
-
 <div id="to_center" class="container">
-  <div style="width:35vw;margin-left:0px;" class="row">
-    <button class="col-lg-4 text-centering">Pre-process</button>
-    <button class="col-lg-4 text-centering">Process details</button>
-    <button class="col-lg-4 text-centering">Post-Process</button>
+  <div class="header">
+
   </div>
-  <div id="picture_holder">
-  </div>
+  <div class="card card-default">
+   <div class="card-header header">
+         <button id="play" class="btn btn-outline-secondary" (click)="launchCarving()"><img src="/assets/images/seam/play-button.png" id="img-play"></button>
+         <h2 id="carving-title">Seam Carving</h2>
+   </div>
+   <div class="card-body">
+     <h3 class="card-title">Concept</h3>
+     <p class="card-text">
+       Quoting <a href="https://en.wikipedia.org/wiki/Seam_carving">wikipedia</a>: "<i>Seam carving (or liquid rescaling) is an algorithm for content-aware image resizing, developed by Shai Avidan, of Mitsubishi Electric Research Laboratories (MERL), and Ariel Shamir, of the Interdisciplinary Center and MERL.
+      It functions by establishing a number of seams (paths of least importance) in an image and automatically removes seams to reduce image size or inserts seams to extend it.</i>"
+     </p>
+   </div>
+ </div>
+
+  <ngb-tabset activeId="'preprocess'">
+   <ngb-tab id="preprocess" title="Pre-process">
+     <ng-template ngbTabContent>
+       <div id="picture_holder_1">
+       </div>
+     </ng-template>
+   </ngb-tab>
+   <ngb-tab title="Process details" [disabled]="!isDone">
+     <ng-template ngbTabContent>
+         <div id="picture_holder_2">
+         </div>
+     </ng-template>
+   </ngb-tab>
+   <ngb-tab title="Post-Process" [disabled]="!isDone">
+     <ng-template ngbTabContent>
+         <div id="picture_holder_3">
+         </div>
+     </ng-template>
+   </ngb-tab>
+ </ngb-tabset>
   <div id="button-menu">
       <button id="btn-1" class="btn image-button" (click)="switchPicture(1)"></button>
       <button id="btn-2" class="btn image-button" (click)="switchPicture(2)"></button>
       <button id="btn-3" class="btn image-button" (click)="switchPicture(3)"></button>
       <button id="btn-4" class="btn image-button" (click)="switchPicture(4)"></button>
   </div>
+
 </div>

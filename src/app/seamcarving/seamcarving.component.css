@@ -1,28 +1,42 @@
 #to_center {
   margin: auto;
-  width: 35vw;
+  width: 54vw;
   padding: 10px;
 }
 
 #button-menu {
   margin: auto;
-  width: 35vw;
+  width: 54vw;
   padding: 10px;
 
     display: flex;
     justify-content: center;
 }
 
-#picture_holder {
-  height: 18vw;
-  width: 35vw;
+#picture_holder_1, #picture_holder_2, #picture_holder_3 {
+  height: 30vw;
+  width: 54vw;
   border: 1px solid #151719;
+}
+
+#picture_holder_1 {
   background: url('/assets/images/seam/1.jpg') no-repeat;
   background-size: cover;
+
 }
 
 .text-centering {
   text-align: center;
+}
+
+.header {
+      display: flex;
+      margin-bottom: 0;
+}
+
+#to_center .card {
+  width: 54vw;
+  margin-bottom: 20px;
 }
 
 .image-button {
@@ -49,4 +63,12 @@
 #btn-4 {
   background: url('/assets/images/seam/4.jpg') no-repeat;
   background-size: cover;
+}
+
+#play {
+  margin-right: 5px;
+}
+
+#carving-title {
+  margin-top: 3px;
 }

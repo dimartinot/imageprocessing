@@ -3,14 +3,31 @@ import { NgModule } from '@angular/core';
 
 import { AppComponent } from './app.component';
 import { SeamcarvingComponent } from './seamcarving/seamcarving.component';
+import { CreditsComponent } from './credits/credits.component';
+import { RouterModule,Routes } from '@angular/router';
+import { HomeComponent } from './home/home.component';
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+
+
+const appRoutes: Routes = [
+  {path: 'seamcarving', component: SeamcarvingComponent},
+  {path: 'credits', component: CreditsComponent},
+  {path: '', component: HomeComponent}
+]
+
+
 
 @NgModule({
   declarations: [
     AppComponent,
-    SeamcarvingComponent
+    SeamcarvingComponent,
+    CreditsComponent,
+    HomeComponent
   ],
   imports: [
-    BrowserModule
+    BrowserModule,
+    RouterModule.forRoot(appRoutes),
+    NgbModule.forRoot()
   ],
   providers: [],
   bootstrap: [AppComponent]
