@@ -1,0 +1,52 @@
+#to_center {
+  margin: auto;
+  width: 35vw;
+  padding: 10px;
+}
+
+#button-menu {
+  margin: auto;
+  width: 35vw;
+  padding: 10px;
+
+    display: flex;
+    justify-content: center;
+}
+
+#picture_holder {
+  height: 18vw;
+  width: 35vw;
+  border: 1px solid #151719;
+  background: url('/assets/images/seam/1.jpg') no-repeat;
+  background-size: cover;
+}
+
+.text-centering {
+  text-align: center;
+}
+
+.image-button {
+  margin: auto;
+  padding: 10px;
+  width: 5vw;
+  height: 5vw;
+  border: 1px solid #151719;
+}
+
+#btn-1 {
+  background: url('/assets/images/seam/1.jpg') no-repeat;
+  background-size: cover;
+}
+
+#btn-2 {
+  background: url('/assets/images/seam/2.jpg') no-repeat;
+  background-size: cover;
+}
+#btn-3 {
+  background: url('/assets/images/seam/3.jpg') no-repeat;
+  background-size: cover;
+}
+#btn-4 {
+  background: url('/assets/images/seam/4.jpg') no-repeat;
+  background-size: cover;
+}
