@@ -1,22 +1,27 @@
 import { Component, OnInit } from '@angular/core';
+import { SeamCarvingService } from '../services/seamcarving.service';
+import { ToCarveImage } from './classes/ToCarveImage';
 
 @Component({
   selector: 'app-seamcarving',
   templateUrl: './seamcarving.component.html',
   styleUrls: ['./seamcarving.component.css']
 })
+
 export class SeamcarvingComponent implements OnInit {
   idPicture: number = 1;
   isDone: boolean = false;
-  constructor() { }
+  toCarveImage: ToCarveImage;
+  constructor() {
+  }
 
   ngOnInit() {
   }
 
-  switchPicture(id number) {
+  switchPicture(id number): void {
     this.isDone = false;
     if (id != this.idPicture) {
-      var picture_holder = $("#picture_holder_1");
+      let picture_holder = $("#picture_holder_1");
       if (id == 1) {
         this.idPicture = 1;
         picture_holder.css('background',"url('/assets/images/seam/1.jpg') no-repeat");
@@ -34,19 +39,25 @@ export class SeamcarvingComponent implements OnInit {
     }
   }
 
-  launchCarving() {
-    this.isDone = true;
-    console.log(true);
-      var img = new Image();
-      img.onload = function() {
-        var canvas = document.createElement("canvas");
-        canvas.width = img.width;
-        canvas.height = img.height;
-        // Copy the image contents to the canvas
-        var ctx = canvas.getContext("2d");
-        ctx.drawImage(img, 0, 0);
-        console.log(ctx);
-      }
-      img.src = '/assets/images/seam/'+this.idPicture+'.jpg';
 
+  launchCarving(): void {
+      this.isDone = true;
+      this.toCarveImage = new ToCarveImage('/assets/images/seam/'+this.idPicture+'.jpg');
+      console.log(this.toCarveImage);
+      this.setEnergyImg();
+    }
+
+    setEnergyImg(): void {
+      let data = new Array();
+      for (let i = 0; i < this.toCarveImage.energyArray.length; i+=1) {
+        data.push(parseFloat(this.toCarveImage.energyArray[i].r));
+        data.push(parseFloat(this.toCarveImage.energyArray[i].g));
+        data.push(parseFloat(this.toCarveImage.energyArray[i].b));
+        data.push(255);
+      }
+      let energyImage = new ImageData(new Uint8ClampedArray(data),this.toCarveImage.initialWidth,this.toCarveImage.initialHeight);
+      let picture_holder_2=document.getElementById("picture_holder_2");
+      let ctx = picture_holder_2.getContext("2d");
+      ctx.putImageData(energyImage,0,0);
+    }
 }

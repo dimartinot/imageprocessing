@@ -16,23 +16,23 @@
    </div>
  </div>
 
-  <ngb-tabset activeId="'preprocess'">
+  <ngb-tabset activeId="'preprocess'" [destroyOnHide]="false">
    <ngb-tab id="preprocess" title="Pre-process">
      <ng-template ngbTabContent>
-       <div id="picture_holder_1">
-       </div>
+       <canvas id="picture_holder_1">
+       </canvas>
      </ng-template>
    </ngb-tab>
-   <ngb-tab title="Process details" [disabled]="!isDone">
+   <ngb-tab title="Process details" id="processdetail" [disabled]="!isDone">
      <ng-template ngbTabContent>
-         <div id="picture_holder_2">
-         </div>
+         <canvas id="picture_holder_2">
+         </canvas>
      </ng-template>
    </ngb-tab>
-   <ngb-tab title="Post-Process" [disabled]="!isDone">
+   <ngb-tab title="Post-Process" id="postprocess" [disabled]="!isDone">
      <ng-template ngbTabContent>
-         <div id="picture_holder_3">
-         </div>
+         <canvas id="picture_holder_3">
+         </canvas>
      </ng-template>
    </ngb-tab>
  </ngb-tabset>
