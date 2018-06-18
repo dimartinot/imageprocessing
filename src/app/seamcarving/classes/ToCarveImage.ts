@@ -1,22 +1,40 @@
-import { Pixel } from './Pixel.ts'
+import { Pixel } from './Pixel'
   /**
   * class managing the image carving process and loading
   * @author Thomas DI MARTINO. (http://dimartinot.com)
   */
 export class ToCarveImage {
-    private initialWidth: int;
-    private initialHeight: int;
-    private rgbArray: Pixel[] = new Array();
-    private energyArray: Pixel[] = new Array();
-    private image;
+     initialWidth: number;
+     initialHeight: number;
+     rgbArray: Pixel[] = new Array();
+     energyArray: Pixel[] = new Array();
+     loaded: boolean = false;
     /**
     * Constructor of the class.
-    * @param {string} url - The link to create the Image variable that will, afterward, be transformed into an array of Pixel
+    * @param {number} id - The id to create the Image variable from the correct canvas
     */
-    constructor(url:string) {
-      this.image = new Image();
-      this.image.onload = (() => this.executeCarving(this));
-      this.image.src = url;
+    constructor(public id:number) {
+      this.executeCarving(this);
+    }
+
+    setInitialWidth(width:number): void {
+      this.initialWidth = width;
+    }
+
+    setInitialHeight(height:number): void {
+      this.initialHeight = height;
+    }
+
+    getInitialWidth(): number {
+      return this.initialWidth;
+    }
+
+    getInitialHeight(): number {
+      return this.initialHeight;
+    }
+
+    getEnergyArray(): Pixel[] {
+      return this.energyArray;
     }
 
     /**
@@ -32,12 +50,22 @@ export class ToCarveImage {
     * We initialise an array of Pixels from an Image variable.
     */
     imageToRgbArray(): void {
-      this.initialWidth = this.image.width;
-      this.initialHeight = this.image.height;
       let canvas = document.createElement("canvas");
       let ctx = canvas.getContext("2d");
-      ctx.drawImage(this.image, 0, 0, this.image.width, this.image.height);
-      let data = ctx.getImageData(0, 0, this.image.width, this.image.height).data;
+
+      let imgToGetSize = (<HTMLImageElement> document.getElementById('picture_holder_1'));
+      canvas.setAttribute('height',String(imgToGetSize.height));
+      canvas.setAttribute('width',String(imgToGetSize.width));
+
+      let img = new Image();
+      img.src = '../../../assets/images/seam/'+this.id+'.jpg';
+      let imgWidth = img.width || img.naturalWidth;
+      let imgHeight = img.height || img.naturalHeight;
+      console.log(imgToGetSize.width,imgToGetSize.height);
+      ctx.drawImage(img,0,0,imgToGetSize.width,imgToGetSize.height);
+      this.setInitialWidth(imgToGetSize.width);
+      this.setInitialHeight(imgToGetSize.height);
+      let data = ctx.getImageData(0, 0, imgToGetSize.width,imgToGetSize.height).data;
       //i+=4 because the 4th value is the alpha one
       for (let i = 0; i < data.length; i += 4) {
           let pixel = new Pixel(data[i], data[i+1], data[i+2]);
@@ -82,24 +110,26 @@ export class ToCarveImage {
           x1 = i - 1;
           x2 = i - 2;
         }
-        deltaY += (this.rgbArray[y1].r-this.rgbArray[y2].r)**2+(this.rgbArray[y1].g-this.rgbArray[y2].g)**2+(this.rgbArray[y1].b-this.rgbArray[y2].b)**2;
-        deltaX += (this.rgbArray[x1].r-this.rgbArray[x2].r)**2+(this.rgbArray[x1].g-this.rgbArray[x2].g)**2+(this.rgbArray[x1].b-this.rgbArray[x2].b)**2;
+         deltaY += (this.rgbArray[y1].r-this.rgbArray[y2].r)**2+(this.rgbArray[y1].g-this.rgbArray[y2].g)**2+(this.rgbArray[y1].b-this.rgbArray[y2].b)**2;
+         deltaX += (this.rgbArray[x1].r-this.rgbArray[x2].r)**2+(this.rgbArray[x1].g-this.rgbArray[x2].g)**2+(this.rgbArray[x1].b-this.rgbArray[x2].b)**2;
         listOfEnergy.push(deltaX+deltaY);
       }
       /*
       * We get the maximum energy to normalize the listOfEnergy and make it displayable and understandable
       */
-      let maxEnergy = 0;
+      let maxEnergy = 1;
       for (let i = 0; i < listOfEnergy.length; i += 1) {
         if (listOfEnergy[i]>maxEnergy) {
           maxEnergy = listOfEnergy[i];
         }
       }
       for (let i = 0; i < this.rgbArray.length; i += 1) {
-        let value = 255*listOfEnergy[i]/maxEnergy;
+         let value = listOfEnergy[i]/255;
         let pixel = new Pixel(value,value,value);
         this.energyArray.push(pixel);
       }
+      this.loaded = true;
+
     }
 
 

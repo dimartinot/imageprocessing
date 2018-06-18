@@ -7,7 +7,6 @@ import { CreditsComponent } from './credits/credits.component';
 import { RouterModule,Routes } from '@angular/router';
 import { HomeComponent } from './home/home.component';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
-import { SeamCarvingService } from './services/seamcarving.service';
 
 const appRoutes: Routes = [
   {path: 'seamcarving', component: SeamcarvingComponent},
@@ -30,7 +29,6 @@ const appRoutes: Routes = [
     NgbModule.forRoot()
   ],
   providers: [
-    SeamCarvingService
   ],
   bootstrap: [AppComponent]
 })
