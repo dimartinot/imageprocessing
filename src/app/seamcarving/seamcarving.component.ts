@@ -63,6 +63,7 @@ export class SeamcarvingComponent implements OnInit {
       this.isDone = true;
         this.setToCarveImage(new ToCarveImage(this.idPicture));
         this.setEnergyImg();
+        this.toCarveImage.seamsCalculation();
     }
 
     setEnergyImg(): void {
@@ -73,12 +74,12 @@ export class SeamcarvingComponent implements OnInit {
         data.push(this.toCarveImage.getEnergyArray()[i].b);
         data.push(255);
       }
-      console.log(data);
-      let imgToGetSize = (<HTMLImageElement> document.getElementById('picture_holder_1'));
+      let cvsToGetSize = (<HTMLCanvasElement> document.getElementById('picture_holder_1'));
       let energyImage = new ImageData(new Uint8ClampedArray(data),this.toCarveImage.getInitialWidth(),this.toCarveImage.getInitialHeight());
       let picture_holder_2=<HTMLCanvasElement> document.getElementById("picture_holder_2");
-      picture_holder_2.setAttribute('height',String(imgToGetSize.height));
-      picture_holder_2.setAttribute('width',String(imgToGetSize.width));
+      console.log(cvsToGetSize.scrollHeight,cvsToGetSize.scrollWidth);
+      picture_holder_2.setAttribute('height',String(cvsToGetSize.scrollHeight));
+      picture_holder_2.setAttribute('width',String(cvsToGetSize.scrollWidth));
       // picture_holder_2.getContext('2d').drawImage(energyImage,0,0,imgToGetSize.width,imgToGetSize.height);
       let ctx = picture_holder_2.getContext("2d");
       ctx.putImageData(energyImage,0,0);
