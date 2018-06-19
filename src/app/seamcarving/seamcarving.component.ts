@@ -62,8 +62,9 @@ export class SeamcarvingComponent implements OnInit {
   launchCarving(): void {
       this.isDone = true;
         this.setToCarveImage(new ToCarveImage(this.idPicture));
-        this.setEnergyImg();
         this.toCarveImage.seamsCalculation();
+        this.setEnergyImg();
+
     }
 
     setEnergyImg(): void {

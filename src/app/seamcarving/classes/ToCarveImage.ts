@@ -1,5 +1,4 @@
 import { Pixel } from './Pixel';
-import { Edge } from './Edge';
   /**
   * class managing the image carving process and loading
   * @author Thomas DI MARTINO. (http://dimartinot.com)
@@ -21,11 +20,15 @@ export class ToCarveImage {
     /**
     * Array used to store the amount of energy needed to access a given Pixel
     */
-    seamsArray: number[][] = new Array();
+    energyAccumulatedArray: number[][] = new Array();
     /**
     * Array used to store all the local optimal edges between the key to the value
     */
     edgesArray: Map<number, number> = new Map<number, number>();
+    /**
+    * Array of seams : chain of pixels
+    */
+    seamsArray: number[][] = new Array();
     /**
     * Constructor of the class.
     * @param {number} id - The id to create the Image variable from the correct canvas
@@ -150,16 +153,16 @@ export class ToCarveImage {
     minimumEnergy(i:number, left: number, top: number, right: number, source: number): number {
       let optimum = 0;
       if (left >= 0) {
-        let min = this.seamsArray[i][left];
-        optimum = (i-1)*this.initialHeight+left;
-        if (this.seamsArray[i][top] > min) {
-          min = this.seamsArray[i][top];
-          optimum = (i-1)*this.initialHeight+top;
+        let min = this.energyAccumulatedArray[i][left];
+        optimum = (i)*this.initialWidth+left;
+        if (this.energyAccumulatedArray[i][top] < min) {
+          min = this.energyAccumulatedArray[i][top];
+          optimum = (i)*this.initialWidth+top;
         }
         if (right < this.initialWidth) {
-          if (this.seamsArray[i][right]<min) {
-            min = this.seamsArray[i][right];
-            optimum = (i-1)*this.initialHeight+right;
+          if (this.energyAccumulatedArray[i][right] < min) {
+            min = this.energyAccumulatedArray[i][right];
+            optimum = (i)*this.initialWidth+right;
           }
         }
         if (optimum < 0) {
@@ -169,12 +172,12 @@ export class ToCarveImage {
         }
         return min;
       } else {
-        optimum = (i-1)*this.initialHeight+top;
-        let min = this.seamsArray[i][top];
+        optimum = (i)*this.initialWidth+top;
+        let min = this.energyAccumulatedArray[i][top];
         if (right < this.initialWidth) {
-          if (this.seamsArray[i][right]<min) {
-            optimum = (i-1)*this.initialHeight+right;
-            min = this.seamsArray[i][right];
+          if (this.energyAccumulatedArray[i][right] < min) {
+            optimum = (i)*this.initialWidth+right;
+            min = this.energyAccumulatedArray[i][right];
           }
         }
         if (optimum < 0) {
@@ -186,21 +189,62 @@ export class ToCarveImage {
       }
     }
 
+    /**
+    * This method evaluates the seams of a picture and write them on the seamsArray variable.
+    */
     seamsCalculation(): void {
       let rowOfEnergy = new Array();
       for (let i=0; i < this.initialWidth; i+=1) {
         rowOfEnergy.push(this.energyArray[i].r);
       }
-      this.seamsArray.push(rowOfEnergy);
+      this.energyAccumulatedArray.push(rowOfEnergy);
       for (let i=1; i < this.initialHeight; i+=1) {
         let rowOfEnergy = new Array();
         for (let j=0; j < this.initialWidth; j+=1) {
-          rowOfEnergy.push(this.energyArray[i*this.initialHeight+j].r+this.minimumEnergy(i-1,j-1,j,j+1,i*this.initialHeight+j));
+          rowOfEnergy.push(this.energyArray[i*this.initialWidth+j].r+this.minimumEnergy(i-1,j-1,j,j+1,i*this.initialWidth+j));
         }
-        this.seamsArray.push(rowOfEnergy);
+        this.energyAccumulatedArray.push(rowOfEnergy);
       }
-      console.log(this.edgesArray);
+      let minJ = 0;
+      let minArrival = this.energyAccumulatedArray[this.initialHeight-1][0];
+      for (let i = 0; i < 100; i+=1) {
+        /**
+        * To make sure that minArrival doesn't take the same value twice
+        */
+        for (let j = this.initialWidth-1; j > minJ; j-=1) {
+          minArrival = this.energyAccumulatedArray[this.initialHeight-1][j];
+        }
+        minJ = 0;
+
+        /**
+        * To draw seams, we firstly have to get the lowest bottom value, as it is the equivalent of an arrival value
+        */
+        for (let j = 1; j < this.initialWidth; j+=1) {
+          if (minArrival > this.energyAccumulatedArray[this.initialHeight-1][j] && this.energyAccumulatedArray[this.initialHeight-1][j]>0) {
+            minArrival = this.energyAccumulatedArray[this.initialHeight-1][j];
+            minJ = j;
+          }
+        }
+        console.log(minJ);
+        /**
+        * Then, we set the energy value to -1 in order to be sure not to pass through it again
+        */
+        this.energyAccumulatedArray[this.initialHeight-1][minJ] = -1;
+        let seam = new Array();
+        let minPixel = (this.initialHeight-1)*this.initialWidth+minJ;
+        let tmpMinPixel = 0;
+        seam.push(minPixel);
+        /**
+        * Afterward, we loop on the Map collection to reconstruct the path and delete the visited edges in order not to go through the same path twice
+        */
+        while (minPixel > this.initialWidth) {
+          tmpMinPixel = this.edgesArray.get(minPixel);
+          this.edgesArray.delete(minPixel);
+          minPixel = tmpMinPixel;
+          seam.push(minPixel);
+          this.energyArray[minPixel] = new Pixel(255,0,0);
+        }
+        this.seamsArray.push(seam);
+      }
     }
-
-
 }
