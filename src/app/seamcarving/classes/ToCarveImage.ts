@@ -150,6 +150,41 @@ export class ToCarveImage {
       }
     }
 
+    minOfThree(i:number, left: number, top: number, right: number): number {
+      let optimum = 0;
+      if (left >= 0) {
+
+          let min = Infinity;
+          try {
+            min = this.energyAccumulatedArray[i][left];
+          } catch (e) {
+            console.log(i,left);
+            throw e;
+          }        optimum = (i)*this.initialWidth+left;
+        if (this.energyAccumulatedArray[i][top] < min) {
+          min = this.energyAccumulatedArray[i][top];
+          optimum = (i)*this.initialWidth+top;
+        }
+        if (right < this.initialWidth) {
+          if (this.energyAccumulatedArray[i][right] < min) {
+            min = this.energyAccumulatedArray[i][right];
+            optimum = (i)*this.initialWidth+right;
+          }
+        }
+        return optimum;
+      } else {
+        optimum = (i)*this.initialWidth+top;
+        let min = this.energyAccumulatedArray[i][top];
+        if (right < this.initialWidth) {
+          if (this.energyAccumulatedArray[i][right] < min) {
+            optimum = (i)*this.initialWidth+right;
+            min = this.energyAccumulatedArray[i][right];
+          }
+        }
+        return optimum;
+      }
+    }
+
     minimumEnergy(i:number, left: number, top: number, right: number, source: number): number {
       let optimum = 0;
       if (left >= 0) {
@@ -225,11 +260,10 @@ export class ToCarveImage {
             minJ = j;
           }
         }
-        console.log(minJ);
         /**
         * Then, we set the energy value to -1 in order to be sure not to pass through it again
         */
-        this.energyAccumulatedArray[this.initialHeight-1][minJ] = -1;
+        this.energyAccumulatedArray[this.initialHeight-1][minJ] = Infinity;
         let seam = new Array();
         let minPixel = (this.initialHeight-1)*this.initialWidth+minJ;
         let tmpMinPixel = 0;
@@ -238,8 +272,13 @@ export class ToCarveImage {
         * Afterward, we loop on the Map collection to reconstruct the path and delete the visited edges in order not to go through the same path twice
         */
         while (minPixel > this.initialWidth) {
-          tmpMinPixel = this.edgesArray.get(minPixel);
-          this.edgesArray.delete(minPixel);
+          //tmpMinPixel = this.edgesArray.get(minPixel);
+          //this.edgesArray.delete(minPixel);
+          let x = Math.floor(minPixel / this.initialWidth);
+          let y = Math.floor(minPixel % this.initialWidth);
+          console.log(minPixel,this.initialWidth);
+          this.energyAccumulatedArray[x][y] = Infinity;
+          tmpMinPixel = this.minOfThree(x-1, y-1, y, y+1);
           minPixel = tmpMinPixel;
           seam.push(minPixel);
           this.energyArray[minPixel] = new Pixel(255,0,0);
