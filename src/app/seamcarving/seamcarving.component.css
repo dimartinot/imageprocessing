@@ -1,12 +1,12 @@
 #to_center {
   margin: auto;
-  width: 54vw;
+  width: 64vw;
   padding: 10px;
 }
 
 #button-menu {
   margin: auto;
-  width: 54vw;
+  width: 64vw;
   padding: 10px;
 
     display: flex;
@@ -14,12 +14,15 @@
 }
 
 #picture_holder_1, #picture_holder_2, #picture_holder_3 {
-  height: 30vw;
-  width: 54vw;
   border: 1px solid #151719;
+  padding: 0;
+  margin: auto;
+  display: block;
 }
 
 #picture_holder_1 {
+  height: 36vw;
+  width: 64vw;
   background-image: url('/assets/images/seam/1.jpg');
   background-repeat: no-repeat;
   background-size: cover;
@@ -36,7 +39,7 @@
 }
 
 #to_center .card {
-  width: 54vw;
+  width: 64vw;
   margin-bottom: 20px;
 }
 

@@ -1,6 +1,7 @@
 import { Pixel } from './Pixel';
   /**
-  * class managing the image carving process and loading
+  * @class
+  * @classdesc class managing the image carving process and loading
   * @author Thomas DI MARTINO. (http://dimartinot.com)
   */
 export class ToCarveImage {
@@ -22,39 +23,69 @@ export class ToCarveImage {
     */
     energyAccumulatedArray: number[][] = new Array();
     /**
-    * Array used to store all the local optimal edges between the key to the value
-    */
-    edgesArray: Map<number, number> = new Map<number, number>();
-    /**
     * Array of seams : chain of pixels
     */
     seamsArray: number[][] = new Array();
     /**
+    * Array used to store the result of the carving process
+    */
+    carvedImage : Pixel[] = new Array();
+
+    /**
     * Constructor of the class.
+    * @constructor
     * @param {number} id - The id to create the Image variable from the correct canvas
     */
-    constructor(public id:number) {
+    constructor(private id:number) {
       this.executeCarving(this);
     }
 
+    /**
+    * Setter of the initialWidth attribute
+    * @param {number} width - the width to set the initialWidth at
+    */
     setInitialWidth(width:number): void {
       this.initialWidth = width;
     }
 
+    /**
+    * Setter of the initialHeight attribute
+    * @param {number} height - the height to set the initialHeight at
+    */
     setInitialHeight(height:number): void {
       this.initialHeight = height;
     }
 
+    /**
+    * Getter of the initialWidth attribute
+    * @return {number} - returns the initialWidth of the ToCarveImage object
+    */
     getInitialWidth(): number {
       return this.initialWidth;
     }
 
+    /**
+    * Getter of the initialHeight attribute
+    * @return {number} - returns the initialHeight of the ToCarveImage object
+    */
     getInitialHeight(): number {
       return this.initialHeight;
     }
 
+    /**
+    * Getter of the energyArray attribute
+    * @return {Pixel[]} - returns the energyArray of the ToCarveImage object
+    */
     getEnergyArray(): Pixel[] {
       return this.energyArray;
+    }
+
+    /**
+    * Getter of the carvedImage attribute
+    * @return {Pixel[]} - returns the energyArray of the carvedImage object
+    */
+    getCarvedImage() : Pixel[] {
+      return this.carvedImage;
     }
 
     /**
@@ -67,7 +98,7 @@ export class ToCarveImage {
     }
 
     /**
-    * We initialise an array of Pixels from an Image variable.
+    * Procedure used to initialise an array of Pixels object (cf Pixel.ts for more details) into the rgbArray attribute
     */
     imageToRgbArray(): void {
       let canvas = document.createElement("canvas");
@@ -150,21 +181,26 @@ export class ToCarveImage {
       }
     }
 
+    /**
+    * Return the <b> position </b> of the pixel of lowest energy on top of the current one.
+    *  @param {number} i - describes the row where the three pixels to work on are positioned
+    * @param {number} left - describes the column of the pixel at the top left
+    * @param {number} top - describes the column of the pixel at the top
+    * @param {number} right - describes the column of the pixel at the top right
+    * @return {number} - the position of the chosen pixel
+    */
     minOfThree(i:number, left: number, top: number, right: number): number {
       let optimum = 0;
+      //We firsty check if the left pixel is, indeed, in the image
       if (left >= 0) {
-
           let min = Infinity;
-          try {
-            min = this.energyAccumulatedArray[i][left];
-          } catch (e) {
-            console.log(i,left);
-            throw e;
-          }        optimum = (i)*this.initialWidth+left;
+          min = this.energyAccumulatedArray[i][left];
+          optimum = (i)*this.initialWidth+left;
         if (this.energyAccumulatedArray[i][top] < min) {
           min = this.energyAccumulatedArray[i][top];
           optimum = (i)*this.initialWidth+top;
         }
+        //If the left pixel is, indeed, in the image, we check for the right one
         if (right < this.initialWidth) {
           if (this.energyAccumulatedArray[i][right] < min) {
             min = this.energyAccumulatedArray[i][right];
@@ -172,9 +208,11 @@ export class ToCarveImage {
           }
         }
         return optimum;
+        //If the left pixel is not in the image, we check the two others
       } else {
         optimum = (i)*this.initialWidth+top;
         let min = this.energyAccumulatedArray[i][top];
+        //Starting with the right one
         if (right < this.initialWidth) {
           if (this.energyAccumulatedArray[i][right] < min) {
             optimum = (i)*this.initialWidth+right;
@@ -185,7 +223,15 @@ export class ToCarveImage {
       }
     }
 
-    minimumEnergy(i:number, left: number, top: number, right: number, source: number): number {
+    /**
+    * Return the <b> energy value </b> of the pixel of lowest energy on top of the current one.
+    *  @param {number} i - describes the row where the three pixels to work on are positioned
+    * @param {number} left - describes the column of the pixel at the top left
+    * @param {number} top - describes the column of the pixel at the top
+    * @param {number} right - describes the column of the pixel at the top right
+    * @return {number} - the energy value of the chosen pixel
+    */
+    minimumEnergy(i:number, left: number, top: number, right: number): number {
       let optimum = 0;
       if (left >= 0) {
         let min = this.energyAccumulatedArray[i][left];
@@ -200,11 +246,6 @@ export class ToCarveImage {
             optimum = (i)*this.initialWidth+right;
           }
         }
-        if (optimum < 0) {
-          this.edgesArray.set(source,0);
-        } else {
-          this.edgesArray.set(source,optimum);
-        }
         return min;
       } else {
         optimum = (i)*this.initialWidth+top;
@@ -215,17 +256,84 @@ export class ToCarveImage {
             min = this.energyAccumulatedArray[i][right];
           }
         }
-        if (optimum < 0) {
-          this.edgesArray.set(source,0);
-        } else {
-          this.edgesArray.set(source,optimum);
-        }
         return min;
       }
     }
 
     /**
+    * This method determines the closest Top neightbour of a Pixel that is not a part of a seam. As seam will be deleted, the pixels that are already part of one can be considered as not existing.
+    * @param {number} currentX - the x coordinate of the current pixel
+    * @param {number} currentY - the y coordinate of the current pixel
+    * @return the y coordinate of the future top neighbour
+    */
+    getCloserNonSeamTopNeightbour(currentX: number, currentY: number): number {
+      let leftY = currentY;
+      let leftPixel = (leftY+currentX*this.initialWidth);
+      let rightY = currentY;
+      let rightPixel = (rightY+currentX*this.initialWidth);
+      if (leftY >= 0 && rightY < this.initialWidth) {
+        while (leftY >= 0 && (this.energyArray[leftPixel].equals(new Pixel(255,0,0)))) {
+            leftY--;
+            leftPixel--;
+        }
+        while (rightY < this.initialWidth && this.energyArray[rightPixel].equals(new Pixel(255,0,0))) {
+            rightY++;
+            rightPixel++;
+        }
+      }
+      let diffRight = Math.abs(currentY-rightY);
+      let diffLeft = Math.abs(currentY-leftY);
+      if (diffRight < diffLeft) {
+        if (rightY < this.initialWidth) {
+          return rightY;
+        } else {
+          return leftY;
+        }
+      } else {
+        if (leftY >= 0) {
+          return leftY;
+        } else {
+          return rightY;
+        }
+      }
+    }
+
+    /**
+    * This method determines the closest left neightbour of a Pixel based on the already calculated top one
+    * @param {number} topX - the x coordinate of the top pixel
+    * @param {number} topY - the y coordinate of the top pixel
+    * @return the y coordinate of the future left neighbour
+    */
+    getCloserNonSeamLeftNeighbour(topX: number, topY: number): number {
+      let leftY = topY-1;
+      let leftPixel = (leftY+topX*this.initialWidth);
+      while (leftY >= 0 && this.energyArray[leftPixel].equals(new Pixel(255,0,0)) ) {
+        leftY--;
+        leftPixel--;
+        // console.log(topX,topY,leftPixel,leftY,this.energyArray[leftPixel].equals(new Pixel(255,0,0)));
+      }
+      return leftY;
+    }
+
+    /**
+    * This method determines the closest right neightbour of a Pixel based on the already calculated top one
+    * @param {number} topX - the x coordinate of the top pixel
+    * @param {number} topY - the y coordinate of the top pixel
+    * @return the y coordinate of the future right neighbour
+    */
+    getCloserNonSeamRightNeighbour(topX: number, topY: number): number {
+      let rightY = topY+1;
+      let rightPixel = (rightY+topX*this.initialWidth);
+      while (rightY < this.initialWidth && this.energyArray[rightPixel].equals(new Pixel(255,0,0))) {
+        rightY++;
+        rightPixel++;
+      }
+      return rightY;
+    }
+
+    /**
     * This method evaluates the seams of a picture and write them on the seamsArray variable.
+    * Then, they are drawn onto the result canva as red lines.
     */
     seamsCalculation(): void {
       let rowOfEnergy = new Array();
@@ -236,26 +344,20 @@ export class ToCarveImage {
       for (let i=1; i < this.initialHeight; i+=1) {
         let rowOfEnergy = new Array();
         for (let j=0; j < this.initialWidth; j+=1) {
-          rowOfEnergy.push(this.energyArray[i*this.initialWidth+j].r+this.minimumEnergy(i-1,j-1,j,j+1,i*this.initialWidth+j));
+          rowOfEnergy.push(this.energyArray[i*this.initialWidth+j].r+this.minimumEnergy(i-1,j-1,j,j+1));
         }
         this.energyAccumulatedArray.push(rowOfEnergy);
       }
       let minJ = 0;
-      let minArrival = this.energyAccumulatedArray[this.initialHeight-1][0];
-      for (let i = 0; i < 100; i+=1) {
-        /**
-        * To make sure that minArrival doesn't take the same value twice
-        */
-        for (let j = this.initialWidth-1; j > minJ; j-=1) {
-          minArrival = this.energyAccumulatedArray[this.initialHeight-1][j];
-        }
-        minJ = 0;
-
+      let minArrival = Infinity;
+      for (let i = 0; i < 50; i+=1) {
+        minArrival = Infinity;
         /**
         * To draw seams, we firstly have to get the lowest bottom value, as it is the equivalent of an arrival value
         */
-        for (let j = 1; j < this.initialWidth; j+=1) {
-          if (minArrival > this.energyAccumulatedArray[this.initialHeight-1][j] && this.energyAccumulatedArray[this.initialHeight-1][j]>0) {
+        let tmpMinJ = minJ;
+        for (let j =0; j < this.initialWidth; j+=1) {
+          if (minArrival > this.energyAccumulatedArray[this.initialHeight-1][j] && this.energyAccumulatedArray[this.initialHeight-1][j] != Infinity && tmpMinJ != j) {
             minArrival = this.energyAccumulatedArray[this.initialHeight-1][j];
             minJ = j;
           }
@@ -263,27 +365,46 @@ export class ToCarveImage {
         /**
         * Then, we set the energy value to -1 in order to be sure not to pass through it again
         */
-        this.energyAccumulatedArray[this.initialHeight-1][minJ] = Infinity;
         let seam = new Array();
         let minPixel = (this.initialHeight-1)*this.initialWidth+minJ;
         let tmpMinPixel = 0;
+        this.energyAccumulatedArray[this.initialHeight-1][minJ] = Infinity;
+        this.energyArray[minPixel] = new Pixel(255,0,0);
         seam.push(minPixel);
         /**
         * Afterward, we loop on the Map collection to reconstruct the path and delete the visited edges in order not to go through the same path twice
         */
-        while (minPixel > this.initialWidth) {
-          //tmpMinPixel = this.edgesArray.get(minPixel);
-          //this.edgesArray.delete(minPixel);
+        while (minPixel >= this.initialWidth) {
           let x = Math.floor(minPixel / this.initialWidth);
           let y = Math.floor(minPixel % this.initialWidth);
-          console.log(minPixel,this.initialWidth);
-          this.energyAccumulatedArray[x][y] = Infinity;
-          tmpMinPixel = this.minOfThree(x-1, y-1, y, y+1);
+          let topPixel = this.getCloserNonSeamTopNeightbour(x-1,y);
+          let leftPixel = this.getCloserNonSeamLeftNeighbour(Math.floor(topPixel / this.initialWidth), Math.floor(topPixel % this.initialWidth));
+          let rightPixel = this.getCloserNonSeamRightNeighbour(Math.floor(topPixel / this.initialWidth), Math.floor(topPixel % this.initialWidth));
+          tmpMinPixel = this.minOfThree(x-1, leftPixel, topPixel, rightPixel);
           minPixel = tmpMinPixel;
           seam.push(minPixel);
+          x = Math.floor(minPixel / this.initialWidth);
+          y = Math.floor(minPixel % this.initialWidth);
           this.energyArray[minPixel] = new Pixel(255,0,0);
+          this.energyAccumulatedArray[x][y] = Infinity;
         }
         this.seamsArray.push(seam);
+      }
+    }
+
+    /**
+    * This method copies every pixel of the original rgbArray except the seams
+    */
+    applyCarving(): void {
+      let redPixel = new Pixel(255,0,0);
+      let counter = 0;
+      for (let i = 0; i < this.rgbArray.length; i+=1) {
+        //If the current pixel is not in a seam, copy it
+        if (!this.energyArray[i].equals(redPixel)) {
+          this.carvedImage.push(this.rgbArray[i]);
+        } else {
+          counter++;
+        }
       }
     }
 }
