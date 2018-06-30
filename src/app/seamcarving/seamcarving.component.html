@@ -4,8 +4,8 @@
   </div>
   <div class="card card-default">
    <div class="card-header header">
-         <button id="play" class="btn btn-outline-secondary" (click)="launchCarving()"><img src="/assets/images/seam/play-button.png" id="img-play"></button>
-         <h2 id="carving-title">Seam Carving</h2>
+         <button id="play" class="btn btn-outline-secondary" (click)="launchCarving();"><img src="/assets/images/seam/play-button.png" id="img-play"></button>
+         <h2 id="carving-title">Seam Carving {{ progress }}</h2>
    </div>
    <div class="card-body">
      <h3 class="card-title">Concept</h3>
@@ -15,32 +15,41 @@
      </p>
    </div>
  </div>
-
-  <ngb-tabset activeId="'preprocess'" [destroyOnHide]="false">
+  <ngb-tabset activeId="'preprocess'" [destroyOnHide]="false" #t="ngbTabset">
    <ngb-tab id="preprocess" title="Pre-process">
      <ng-template ngbTabContent>
-       <canvas id="picture_holder_1">
-       </canvas>
+       <div class="canvas-container">
+         <canvas id="picture_holder_1">
+         </canvas>
+       </div>
      </ng-template>
    </ngb-tab>
    <ngb-tab title="Process details" id="processdetail" [disabled]="!isDone">
      <ng-template ngbTabContent>
+       <div class="canvas-container">
          <canvas id="picture_holder_2">
          </canvas>
+       </div>
      </ng-template>
    </ngb-tab>
    <ngb-tab title="Post-Process" id="postprocess" [disabled]="!isDone">
      <ng-template ngbTabContent>
+       <div class="canvas-container">
          <canvas id="picture_holder_3">
          </canvas>
+       </div>
      </ng-template>
    </ngb-tab>
  </ngb-tabset>
   <div id="button-menu">
-      <button id="btn-1" class="btn image-button" (click)="switchPicture(1)"></button>
-      <button id="btn-2" class="btn image-button" (click)="switchPicture(2)"></button>
-      <button id="btn-3" class="btn image-button" (click)="switchPicture(3)"></button>
-      <button id="btn-4" class="btn image-button" (click)="switchPicture(4)"></button>
+      <button id="btn-1" class="btn image-button" (click)="switchPicture(1);t.select('preprocess')"></button>
+      <button id="btn-2" class="btn image-button" (click)="switchPicture(2);t.select('preprocess')"></button>
+      <button id="btn-3" class="btn image-button" (click)="switchPicture(3);t.select('preprocess')"></button>
+      <button id="btn-4" class="btn image-button" (click)="switchPicture(4);t.select('preprocess')"></button>
   </div>
+
+
+
+
 
 </div>

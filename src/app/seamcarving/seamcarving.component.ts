@@ -1,6 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { ToCarveImage } from './classes/ToCarveImage';
+import { NgbModal, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { Observable } from 'rxjs';
+import { of } from 'rxjs';
+
 import * as $ from 'jquery';
+
 @Component({
   selector: 'app-seamcarving',
   templateUrl: './seamcarving.component.html',
@@ -13,6 +18,19 @@ import * as $ from 'jquery';
 * @author Thomas DI MARTINO. (http://dimartinot.com)
 */
 export class SeamcarvingComponent implements OnInit {
+  @Input() progress: String = "";
+  progressObservable = new Observable((observer) => {
+      observer.next("Loading of Image data..");
+      this.setToCarveImage(new ToCarveImage(this.idPicture));
+      observer.next("Launching seams calculation..");
+      this.toCarveImage.seamsCalculation();
+      observer.next("Drawing seams..");
+      this.setEnergyImg();
+      observer.next("Applying carving process..");
+      this.toCarveImage.applyCarving();
+      this.setCarvedImg();
+      observer.next("Done !");
+  });
   /**
   * Tells when the calculation is over
   */
@@ -25,7 +43,11 @@ export class SeamcarvingComponent implements OnInit {
   * Describes the ToCarveImage object that is to be drawn
   */
   toCarveImage: ToCarveImage;
-  constructor() {
+  /**
+  * Describes the progress of the calculation
+  */
+  progressInfo: String;
+  constructor(private modalService: NgbModal) {
   }
 
   ngOnInit() {
@@ -37,6 +59,7 @@ export class SeamcarvingComponent implements OnInit {
   */
   switchPicture(id: number): void {
     if (id != this.idPicture) {
+      this.isDone = false;
       var picture_holder = $("#picture_holder_1");
       // var picture_holder_2 = $("#picture_holder_2");
       // var picture_holder_3 = $("#picture_holder_3");
@@ -74,13 +97,16 @@ export class SeamcarvingComponent implements OnInit {
   * Launches the carving procedure, divided in multiple sub-procedures.
   */
   launchCarving(): void {
-        this.setToCarveImage(new ToCarveImage(this.idPicture));
-        this.toCarveImage.seamsCalculation();
-        this.setEnergyImg();
-        this.toCarveImage.applyCarving();
-        this.setCarvedImg();
-        this.isDone = true;
-    }
+    var promise = new Promise((resolve, reject) => {
+        this.progressObservable.subscribe({
+          next(value) { this.progress = value }
+        });
+      resolve();
+    });
+    promise.then( () => {
+      this.isDone = true;
+    });
+  }
 
     /**
     * Draws the energyImage in the "process details" area
@@ -119,4 +145,5 @@ export class SeamcarvingComponent implements OnInit {
       let ctx = picture_holder_3.getContext("2d");
       ctx.putImageData(energyImage,0,0);
     }
+
 }

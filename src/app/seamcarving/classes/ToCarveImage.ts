@@ -350,7 +350,26 @@ export class ToCarveImage {
       }
       let minJ = 0;
       let minArrival = Infinity;
-      for (let i = 0; i < 50; i+=1) {
+      for (let i = 0; i < 100; i+=1) {
+
+        let temporaryEAA = new Array();
+        temporaryEAA.push(this.energyAccumulatedArray[0]);
+        for (let t=1; t < this.initialHeight; t+=1) {
+          let rowOfEnergy = new Array();
+          for (let j=0; j < this.initialWidth; j+=1) {
+            let topPixel = this.getCloserNonSeamTopNeightbour(t-1,j);
+            let leftPixel = this.getCloserNonSeamLeftNeighbour(Math.floor(topPixel / this.initialWidth), Math.floor(topPixel % this.initialWidth));
+            let rightPixel = this.getCloserNonSeamRightNeighbour(Math.floor(topPixel / this.initialWidth), Math.floor(topPixel % this.initialWidth));
+            if (this.energyAccumulatedArray[t][j] != Infinity) {
+              rowOfEnergy.push(this.energyArray[t*this.initialWidth+j].r+this.minimumEnergy(t-1,leftPixel,topPixel,rightPixel));
+            } else {
+              rowOfEnergy.push(Infinity);
+            }
+        }
+          temporaryEAA.push(rowOfEnergy);
+        }
+        this.energyAccumulatedArray = temporaryEAA;
+
         minArrival = Infinity;
         /**
         * To draw seams, we firstly have to get the lowest bottom value, as it is the equivalent of an arrival value
@@ -406,5 +425,6 @@ export class ToCarveImage {
           counter++;
         }
       }
+      console.log(counter);
     }
 }

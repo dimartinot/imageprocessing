@@ -21,12 +21,17 @@
 }
 
 #picture_holder_1 {
-  height: 36vw;
-  width: 64vw;
+  height: 18vw;
+  width: 32vw;
   background-image: url('/assets/images/seam/1.jpg');
   background-repeat: no-repeat;
   background-size: cover;
 
+}
+
+.canvas-container {
+    height: 20vw;
+    width: 64vw;
 }
 
 .text-centering {
