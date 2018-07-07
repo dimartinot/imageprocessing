@@ -1,7 +1,7 @@
 #to_center {
-  margin: auto;
   width: 64vw;
   padding: 10px;
+  z-index: 0;
 }
 
 #button-menu {
@@ -21,8 +21,8 @@
 }
 
 #picture_holder_1 {
-  height: 18vw;
-  width: 32vw;
+  height: 27vw;
+  width: 48vw;
   background-image: url('/assets/images/seam/1.jpg');
   background-repeat: no-repeat;
   background-size: cover;
@@ -30,7 +30,7 @@
 }
 
 .canvas-container {
-    height: 20vw;
+    height: 30vw;
     width: 64vw;
 }
 

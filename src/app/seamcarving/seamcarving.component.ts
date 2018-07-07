@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, NgZone } from '@angular/core';
 import { ToCarveImage } from './classes/ToCarveImage';
 import { NgbModal, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Observable } from 'rxjs';
@@ -19,7 +19,8 @@ import * as $ from 'jquery';
 */
 export class SeamcarvingComponent implements OnInit {
   @Input() progress: String = "";
-  progressObservable = new Observable((observer) => {
+  progressObservable = new Observable<String>((observer) => {
+      observer.next("");
       observer.next("Loading of Image data..");
       this.setToCarveImage(new ToCarveImage(this.idPicture));
       observer.next("Launching seams calculation..");
@@ -30,7 +31,8 @@ export class SeamcarvingComponent implements OnInit {
       this.toCarveImage.applyCarving();
       this.setCarvedImg();
       observer.next("Done !");
-  });
+      this.isDone = true;
+    });
   /**
   * Tells when the calculation is over
   */
@@ -97,15 +99,11 @@ export class SeamcarvingComponent implements OnInit {
   * Launches the carving procedure, divided in multiple sub-procedures.
   */
   launchCarving(): void {
-    var promise = new Promise((resolve, reject) => {
-        this.progressObservable.subscribe({
-          next(value) { this.progress = value }
-        });
-      resolve();
-    });
-    promise.then( () => {
-      this.isDone = true;
-    });
+      this.progressObservable.subscribe({
+        next(value) { 
+          () => {console.log(value)}
+        }
+      });
   }
 
     /**
@@ -124,7 +122,6 @@ export class SeamcarvingComponent implements OnInit {
       let picture_holder_2=<HTMLCanvasElement> document.getElementById("picture_holder_2");
       picture_holder_2.setAttribute('height',String(cvsToGetSize.scrollHeight));
       picture_holder_2.setAttribute('width',String(cvsToGetSize.scrollWidth));
-      // picture_holder_2.getContext('2d').drawImage(energyImage,0,0,imgToGetSize.width,imgToGetSize.height);
       let ctx = picture_holder_2.getContext("2d");
       ctx.putImageData(energyImage,0,0);
     }

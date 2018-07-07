@@ -105,23 +105,24 @@ export class ToCarveImage {
       let ctx = canvas.getContext("2d");
 
       let cvsToGetSize = (<HTMLCanvasElement> document.getElementById('picture_holder_1'));
-      canvas.setAttribute('height',String(cvsToGetSize.scrollHeight));
-      canvas.setAttribute('width',String(cvsToGetSize.scrollWidth));
-
-      let img = new Image();
-      img.src = '../../../assets/images/seam/'+this.id+'.jpg';
-      let imgWidth = img.width || img.naturalWidth;
-      let imgHeight = img.height || img.naturalHeight;
-      console.log(cvsToGetSize.scrollWidth,cvsToGetSize.scrollHeight);
-      ctx.drawImage(img,0,0,cvsToGetSize.scrollWidth,cvsToGetSize.scrollHeight);
-      this.setInitialWidth(cvsToGetSize.scrollWidth);
-      this.setInitialHeight(cvsToGetSize.scrollHeight);
-      let data = ctx.getImageData(0, 0, cvsToGetSize.scrollWidth,cvsToGetSize.scrollHeight).data;
-      //i+=4 because the 4th value is the alpha one
-      for (let i = 0; i < data.length; i += 4) {
-          let pixel = new Pixel(data[i], data[i+1], data[i+2]);
-              this.rgbArray.push(pixel);
-          }
+      if (cvsToGetSize != null) {
+        canvas.setAttribute('height',String(cvsToGetSize.scrollHeight));
+        canvas.setAttribute('width',String(cvsToGetSize.scrollWidth));
+  
+        let img = new Image();
+        img.src = '../../../assets/images/seam/'+this.id+'.jpg';
+        let imgWidth = img.width || img.naturalWidth;
+        let imgHeight = img.height || img.naturalHeight;
+        ctx.drawImage(img,0,0,cvsToGetSize.scrollWidth,cvsToGetSize.scrollHeight);
+        this.setInitialWidth(cvsToGetSize.scrollWidth);
+        this.setInitialHeight(cvsToGetSize.scrollHeight);
+        let data = ctx.getImageData(0, 0, cvsToGetSize.scrollWidth,cvsToGetSize.scrollHeight).data;
+        //i+=4 because the 4th value is the alpha one
+        for (let i = 0; i < data.length; i += 4) {
+            let pixel = new Pixel(data[i], data[i+1], data[i+2]);
+                this.rgbArray.push(pixel);
+            }
+      }
     }
 
     /**
