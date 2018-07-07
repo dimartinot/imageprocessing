@@ -81,3 +81,9 @@
 #carving-title {
   margin-top: 3px;
 }
+
+#github-icon, #linkedin-icon {
+  margin: 5px;
+  width: 32px;
+  height: 32px;
+}

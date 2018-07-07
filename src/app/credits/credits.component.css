@@ -1,4 +1,4 @@
-#play_card, #logo_stack {
+.card {
   width: 15vw;
   float:left;
   margin-left: 10px;
@@ -6,4 +6,8 @@
 
 .credit-image {
   width: 15vw;
+}
+
+.container {
+  width: inherit;
 }
