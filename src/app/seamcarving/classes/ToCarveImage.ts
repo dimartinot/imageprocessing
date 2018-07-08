@@ -367,24 +367,31 @@ export class ToCarveImage {
       let minJ = 0;
       let minArrival = Infinity;
       for (let i = 0; i < 100; i+=1) {
-
-        let temporaryEAA = new Array();
-        temporaryEAA.push(this.energyAccumulatedArray[0]);
-        for (let t=1; t < this.initialHeight; t+=1) {
-          let rowOfEnergy = new Array();
-          for (let j=0; j < this.initialWidth; j+=1) {
-            let topPixel = this.getCloserNonSeamTopNeightbour(t-1,j);
-            let leftPixel = this.getCloserNonSeamLeftNeighbour(Math.floor(topPixel / this.initialWidth), Math.floor(topPixel % this.initialWidth));
-            let rightPixel = this.getCloserNonSeamRightNeighbour(Math.floor(topPixel / this.initialWidth), Math.floor(topPixel % this.initialWidth));
-            if (this.energyAccumulatedArray[t][j] != Infinity) {
-              rowOfEnergy.push(this.energyArray[t*this.initialWidth+j].r+this.minimumEnergy(t-1,leftPixel,topPixel,rightPixel));
-            } else {
-              rowOfEnergy.push(Infinity);
+        if (this.seamsArray.length != 0) {
+          //If a seam just got calculated, we do not have to re-evaluate the energyAccumulated component of every pixel, just the one next to the lastly calculated seams
+          for (let s = 0; s < this.seamsArray[this.seamsArray.length-1].length-1; s++) {
+            let seamComponentIndex = this.seamsArray[this.seamsArray.length-1][s];
+            let x = Math.floor(seamComponentIndex / this.initialWidth);
+            let y = Math.floor(seamComponentIndex % this.initialWidth);
+            if (y-1 > 0 && x > 0) {
+              let topPixel = this.getCloserNonSeamTopNeightbour(x-1,y-1);
+              let leftPixel = this.getCloserNonSeamLeftNeighbour(Math.floor(topPixel / this.initialWidth), Math.floor(topPixel % this.initialWidth));
+              let rightPixel = this.getCloserNonSeamRightNeighbour(Math.floor(topPixel / this.initialWidth), Math.floor(topPixel % this.initialWidth));
+              if (this.energyAccumulatedArray[x][y-1] != Infinity) {
+                this.energyAccumulatedArray[x][y-1] = this.energyArray[x*this.initialWidth+y-1].r+this.minimumEnergy(x-1,leftPixel,topPixel,rightPixel);
+              }
             }
+            if (y+1 < this.initialWidth && x > 0) {
+              let topPixel = this.getCloserNonSeamTopNeightbour(x-1,y+1);
+              let leftPixel = this.getCloserNonSeamLeftNeighbour(Math.floor(topPixel / this.initialWidth), Math.floor(topPixel % this.initialWidth));
+              let rightPixel = this.getCloserNonSeamRightNeighbour(Math.floor(topPixel / this.initialWidth), Math.floor(topPixel % this.initialWidth));
+              if (this.energyAccumulatedArray[x][y+1] != Infinity) {
+                this.energyAccumulatedArray[x][y+1] = this.energyArray[x*this.initialWidth+y+1].r+this.minimumEnergy(x-1,leftPixel,topPixel,rightPixel);
+              }
+            }
+          }
         }
-          temporaryEAA.push(rowOfEnergy);
-        }
-        this.energyAccumulatedArray = temporaryEAA;
+        
 
         minArrival = Infinity;
         /**
