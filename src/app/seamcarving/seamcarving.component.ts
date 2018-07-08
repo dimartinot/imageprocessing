@@ -22,7 +22,7 @@ export class SeamcarvingComponent implements OnInit {
   progressObservable = new Observable<String>((observer) => {
       observer.next("");
       observer.next("Loading of Image data..");
-      this.setToCarveImage(new ToCarveImage(this.idPicture));
+      this.setToCarveImage(new ToCarveImage(this.idPicture, '../../../assets/images/seam/'+this.idPicture+'.jpg'));
       observer.next("Launching seams calculation..");
       this.toCarveImage.seamsCalculation();
       observer.next("Drawing seams..");

@@ -17,6 +17,7 @@
   border: 1px solid #151719;
   padding: 0;
   margin: auto;
+  margin-top: 1.5vw;
   display: block;
 }
 
@@ -32,6 +33,11 @@
 .canvas-container {
     height: 30vw;
     width: 64vw;
+    background-color: #fff;
+    border-color: #dee2e6 #dee2e6 #fff;
+    border: 1px solid #dee2e6;
+    border-top-color: transparent;
+
 }
 
 .text-centering {

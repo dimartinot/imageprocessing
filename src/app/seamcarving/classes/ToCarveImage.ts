@@ -35,9 +35,10 @@ export class ToCarveImage {
     * Constructor of the class.
     * @constructor
     * @param {number} id - The id to create the Image variable from the correct canvas
+    * @param {string} src - The link of the image chosen to be carved.
     */
-    constructor(private id:number) {
-      this.executeCarving(this);
+    constructor(private id:number, private src:string) {
+      ToCarveImage.executeCarving(this);
     }
 
     /**
@@ -92,7 +93,7 @@ export class ToCarveImage {
     * Executes the functions to create the carved image
     * @param {ToCarveImage} img - ToCarveImage variable
     */
-    executeCarving(img:ToCarveImage) {
+    static executeCarving(img:ToCarveImage) {
       img.imageToRgbArray();
       img.energyCalculation();
     }
@@ -103,25 +104,39 @@ export class ToCarveImage {
     imageToRgbArray(): void {
       let canvas = document.createElement("canvas");
       let ctx = canvas.getContext("2d");
-
+      let src= this.src;
       let cvsToGetSize = (<HTMLCanvasElement> document.getElementById('picture_holder_1'));
       if (cvsToGetSize != null) {
         canvas.setAttribute('height',String(cvsToGetSize.scrollHeight));
         canvas.setAttribute('width',String(cvsToGetSize.scrollWidth));
   
         let img = new Image();
-        img.src = '../../../assets/images/seam/'+this.id+'.jpg';
+        img.src = src;
         let imgWidth = img.width || img.naturalWidth;
         let imgHeight = img.height || img.naturalHeight;
         ctx.drawImage(img,0,0,cvsToGetSize.scrollWidth,cvsToGetSize.scrollHeight);
         this.setInitialWidth(cvsToGetSize.scrollWidth);
         this.setInitialHeight(cvsToGetSize.scrollHeight);
         let data = ctx.getImageData(0, 0, cvsToGetSize.scrollWidth,cvsToGetSize.scrollHeight).data;
-        //i+=4 because the 4th value is the alpha one
+        //i+=4 because the 4th value is the alpha component
         for (let i = 0; i < data.length; i += 4) {
             let pixel = new Pixel(data[i], data[i+1], data[i+2]);
                 this.rgbArray.push(pixel);
             }
+      } else {
+        let img = new Image();
+        img.src = src;
+        let imgWidth = img.width || img.naturalWidth;
+        let imgHeight = img.height || img.naturalHeight;
+        ctx.drawImage(img,0,0,imgWidth, imgHeight);
+        this.setInitialWidth(imgWidth);
+        this.setInitialHeight(imgHeight);
+        let data = ctx.getImageData(0, 0, imgWidth, imgHeight).data;
+        //i+=4 because the 4th value is the alpha component
+        for (let i = 0; i < data.length; i += 4) {
+            let pixel = new Pixel(data[i], data[i+1], data[i+2]);
+                this.rgbArray.push(pixel); 
+        }
       }
     }
 
